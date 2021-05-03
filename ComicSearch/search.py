@@ -5,10 +5,10 @@ class ComicSearchConfig(object):
         self.genre = genre
     
     def to_basic_search_query(self):
-        return BasicSearchQuery(self.title, self.author, self.genre)
+        return BasicSearchQuery([self.title, self.author, self.genre])
 
 class BasicSearchQuery(object):
-    def __init__(self, *words):
+    def __init__(self, words: list):
         self.words = words
     
     def __str__(self):

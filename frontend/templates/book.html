@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="card mb-5 mt-5">
+        <div class="row no-gutters">
+          <div class="col-md-4">
+            <img src="{{ book['image'] }}" class="card-img" alt="...">
+          </div>
+          <div class="col-md-8 mb-3">
+            <div class="card-body">
+              <h1 class="card-title"><a href="{{ book['url'] }}">{{ book['name'] }}</a></h1>
+              <h4 class="card-text text-secondary">Author(s) : </h5>
+              <p class="card-text">{{ book['authors'] }}</p>
+              <h4 class="card-text text-secondary">Genres</h5>
+              <p class="card-text">{{ book['genres'] }}</p>
+              <h4 class="card-text text-secondary">Views</h5>
+              <p class="card-text">{{ book['views'] }}</p>
+              <h4 class="card-text text-secondary">Updated : </h5>
+              <p class="card-text">{{ book['updated'] }}</p>
+              <h4 class="card-text text-secondary">Description : </h5>
+              <p class="card-text overflow-auto" style="height: 200px">{{ book['description'] }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>
+
+{% endblock %}
