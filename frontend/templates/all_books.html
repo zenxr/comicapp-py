@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row mt-5">
+    {% for book in books %}
+    <div class="col-md-4 mb-5">
+        <div class="card">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card-body text-center">
+                        <h4 class="card-title"><a href="#">{{ book['title'] }}</a></h4>
+                    </div>
+                </div>
+                <div class="col-md-7 align-bottom">
+                    <h5 class="card-text text-secondary">Author(s) : </h5>
+                    <p class="card-text">{{ book['authors'] }}</p>
+                </div>
+                <div class="col-md-4 align-items-center mr-1">
+                    <img src="{{ book['thumbnail'] }}" class="card-img" alt="...">
+                </div>
+                <div class="col-md-12">
+                    <h5 class="card-text text-secondary">Description : </h5>
+                    <p class="card-text overflow-auto" style="height: 200px">{{ book['description'] }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+{% endblock %}

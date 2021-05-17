@@ -2,25 +2,27 @@ import configuration as config
 import requests
 import shutil
 import os
+from pathlib import Path
 from bs4 import BeautifulSoup as soup
+import multiprocessing
 
 def download(urls, title, chapter, dir):
     # For every line in the file
-    for url in urls:
+    for idx, url in enumerate(urls):
         # Split on the rightmost / and take everything on the right side of that
         url = url.rstrip('\r\n')
         name = url.rsplit('/', 1)[-1]
-
+        shortname = str(idx + 1) + name.rsplit('.', 1)[1]
         # if a chapter exists
         if chapter:
-            filename = os.path.join(dir, title, chapter, name)
+            filename = os.path.join(dir, title, chapter, shortname)
             # Combine the name and the downloads directory to get the local filename
         else:
-            filename = os.path.join(dir, title, name)
+            filename = os.path.join(dir, title, shortname)
         # ensure the directory exists
         directory = os.path.dirname(filename)
         if not os.path.exists(directory):
-            os.makedirs(directory)
+            Path(directory).mkdir(parents=True, exist_ok=True)
         # Download the file if it does not exist
         if not os.path.isfile(filename):
             response = requests.get(url, headers=config.headers)
@@ -53,10 +55,15 @@ def getAllChapters(url):
     response = requests.get(url, headers=config.headers)
     page_soup = soup(response.content, "html.parser")
     chapter_list = page_soup.find("div", class_="panel-story-chapter-list")
+    if not chapter_list:
+        chapter_list = page_soup.find("div", class_='manga-info-chapter')
     possible_chapters = chapter_list.findChildren("a", href=True)
     chapters = {}
-    for chapter in possible_chapters:
-        chapters[chapter.text] = chapter['href']
+    for idx, chapter in enumerate(possible_chapters):
+        chapters[str(idx).zfill(4)] = chapter['href']
+    # TODO FIND BETTER WAY
+    # for chapter in possible_chapters:
+    #     chapters[chapter.text] = chapter['href']
     return chapters
 
 def getSeries(url, directory):
@@ -65,7 +72,12 @@ def getSeries(url, directory):
     for chapter in chapters:
         urls = getLinks(chapters[chapter])
         print("Title: " + seriesname + " Chap : " + chapter)
-        download(urls, seriesname, chapter, directory)
+        download(urls, seriesname, chapter.replace(' ', '_'), directory)
+
+def getSeriesMutliProc(url, directory):
+    process = multiprocessing.Process(target=getSeries, args=(url, directory,))
+    process.daemon = True
+    process.start()
 
 if __name__ == "__main__":
     getSeries('https://manganelo.com/manga/wp918498', config.download_dir)

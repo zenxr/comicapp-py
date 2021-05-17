@@ -21,10 +21,27 @@
               <p class="card-text">{{ book['updated'] }}</p>
               <h4 class="card-text text-secondary">Description : </h5>
               <p class="card-text overflow-auto" style="height: 200px">{{ book['description'] }}</p>
+              <a id="downloadButton" class="btn btn-primary">Queue Download</a>
             </div>
           </div>
         </div>
       </div>
 </div>
+<script>
+    var btn = document.getElementById("downloadButton");
+    btn.addEventListener("click", queueDownload);
+    function queueDownload() {
+        data = new FormData();
+        data.set("url", "{{ quote(book['url']) }}");
+        data.set("authors", "{{ quote(book['authors']) }}");
+        data.set("title", "{{ quote(book['name']) }}");
+        data.set("description", "{{ quote(book['description']) }}");
+        data.set("thumbnail", "{{ quote(book['image']) }}")
+
+        let request = new XMLHttpRequest();
+        request.open("POST", "/book", true);
+        request.send(data);
+    }
+</script>
 
 {% endblock %}
