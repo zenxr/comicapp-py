@@ -84,6 +84,7 @@ api.add_resource(Book, '/book')
 api.add_resource(Download, '/download')
 api.add_resource(GetAllBooks, '/getallbooks')
 
+# TODO FINISH THIS
 @app.route('/read/<book_id>')
 def getBook():
     bookurl = request.values.get('bookurl')
