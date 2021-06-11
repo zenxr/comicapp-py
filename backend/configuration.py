@@ -1,6 +1,6 @@
 # path to download to
 # download_dir = './comics'
-download_dir = './comics'
+download_dir = '/data/Files/Comics'
 
 frontend_port = 5600
 backend_port = 5601

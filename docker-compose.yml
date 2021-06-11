@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+        comicapp-frontend:
+                build: ./frontend
+                ports:
+                        - "5600:5600"
+        comicapp-backend:
+                build: ./backend
+                ports:
+                        - "5601:5601"
