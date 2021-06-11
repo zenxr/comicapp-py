@@ -41,10 +41,12 @@ def searchPost():
 @app.route('/book')
 def getBook():
     bookurl = request.values.get('bookurl')
+    base_domain = request.base_url.rsplit(':', 1)[0]
+    backend_url = f'{base_domain}:{str(configuration.backend_port)}/'
     return render_template(
         'book.html',
         book = query_backend(request, 'book', params={'url': bookurl}).json(),
-        download_endpoint = BACKEND_URL + 'download',
+        download_endpoint = backend_url + 'download',
         quote = requests.utils.quote
     )
 
