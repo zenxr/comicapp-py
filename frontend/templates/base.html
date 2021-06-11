@@ -7,8 +7,7 @@
             shrink-to-fit=no">
 
         <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="{{
-            url_for('static',filename='bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap.min.css') }}">
         <meta charset="utf-8">
 
         <title>Comic App!</title>
@@ -28,7 +27,7 @@
                         <a class="nav-link" href="/">Search <span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Catalogue</a>
+                        <a class="nav-link" href="/read">Catalogue</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Subscriptions</a>
@@ -47,5 +46,6 @@
         </div>
         <!-- Optional JavaScript -->
     </body>
-    <script src="{{url_for('static', filename='bootstrap.bundle.min.js') }}" />
+    <script src="{{url_for('static', filename='jquery-3.5.1.slim.min.js') }}"></script>
+    <script src="{{url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
 </html>

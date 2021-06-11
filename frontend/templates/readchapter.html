@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-12">
+        <h1 class="text-center text-primary">{{ chapter_info['title'] }}</h1>
+    </div>
+    <div class="col-12">
+        <h2 class="text-center">{{ chapter_to_text(chapter_info['current_chapter']) }}</h2>
+    </div>
+    <div class="col-12">
+        <div class="text-center dropdown show">
+            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                All Chapters
+            </a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                {% for chapter in chapter_info['chapters'] %}
+                    {% if chapter_info['current_chapter'] == chapter %}
+                    <a class="dropdown-item text-center text-primary" href="{{ chapter }}">{{ chapter_to_text(chapter) }}</a>
+                    {% else %}
+                    <a class="dropdown-item text-center" href="{{ chapter }}">{{ chapter_to_text(chapter) }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% for page in chapter_info['pages'] %}
+<div class="col-12 text-center">
+    <img src="{{ page }}" class="img-fluid" alt="..." />
+</div>
+{% endfor %}
+
+{% endblock %}

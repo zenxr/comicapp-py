@@ -6,13 +6,13 @@ from pathlib import Path
 from bs4 import BeautifulSoup as soup
 import multiprocessing
 
-def download(urls, title, chapter, dir):
+def download(headers, urls, title, chapter, dir):
     # For every line in the file
     for idx, url in enumerate(urls):
         # Split on the rightmost / and take everything on the right side of that
         url = url.rstrip('\r\n')
         name = url.rsplit('/', 1)[-1]
-        shortname = str(idx + 1) + name.rsplit('.', 1)[1]
+        shortname = str(idx + 1).zfill(4) + '.' + name.rsplit('.', 1)[1]
         # if a chapter exists
         if chapter:
             filename = os.path.join(dir, title, chapter, shortname)
@@ -25,7 +25,7 @@ def download(urls, title, chapter, dir):
             Path(directory).mkdir(parents=True, exist_ok=True)
         # Download the file if it does not exist
         if not os.path.isfile(filename):
-            response = requests.get(url, headers=config.headers)
+            response = requests.get(url, headers=headers)
             with open(filename, 'wb') as outfile:
                 outfile.write(response.content)
 
@@ -66,13 +66,21 @@ def getAllChapters(url):
     #     chapters[chapter.text] = chapter['href']
     return chapters
 
+def _update_headers(chapter_url, headers):
+    url_parts = chapter_url.split('.', 1)
+    referer = url_parts[0] + '.' + url_parts[1].split('/')[0]
+    headers['Referer'] = referer
+    return headers
+
 def getSeries(url, directory):
+    headers = config.headers
     seriesname = url.rsplit('/', 1)[1]
     chapters = getAllChapters(url)
     for chapter in chapters:
+        headers = _update_headers(chapters[chapter], headers)
         urls = getLinks(chapters[chapter])
         print("Title: " + seriesname + " Chap : " + chapter)
-        download(urls, seriesname, chapter.replace(' ', '_'), directory)
+        download(headers, urls, seriesname, chapter.replace(' ', '_'), directory)
 
 def getSeriesMutliProc(url, directory):
     process = multiprocessing.Process(target=getSeries, args=(url, directory,))

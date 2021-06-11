@@ -1,4 +1,4 @@
-from flask import Flask, request, Response
+from flask import Flask, request, Response, send_from_directory
 from requests.models import ContentDecodingError
 from flask_restful import reqparse, Api, Resource
 from requests.utils import unquote
@@ -8,12 +8,13 @@ import json
 from ComicSearch.mangakalot_book import MangakalotBook
 from ComicSearch.mangakalot_search import MangakalotSearch
 from ComicSearch.search import BasicSearchQuery
-from ComicDownloader.downloader import download, getSeriesMutliProc
+from ComicDownloader.downloader import download, getSeriesMutliProc, getSeries
 import configuration
 import os
 
 app = Flask(__name__)
 api = Api(app)
+app_url = "http://127.0.0.1:5000"
 
 def get_parser(*args):
     parser = reqparse.RequestParser()
@@ -22,22 +23,21 @@ def get_parser(*args):
     return parser
 
 def saveseriesmetadata(url, title, authors, description, thumbnail):
-    output_filename = url.rsplit('/', 1)[1]
-    if '.' in output_filename:
-        output_filename = output_filename.split('.', 1)[0]
-    output_filename = output_filename + '.json'
+    name = url.rsplit('/', 1)[1]
+    if '.' in name:
+        name = name.split('.', 1)[0]
+    output_filename = name + '.json'
     if not os.path.exists(configuration.download_dir):
         os.mkdir(configuration.download_dir)
-    outputfile = os.path.join(configuration.download_dir, output_filename)
     metadata = {
         'url': url,
         'title': title,
         'authors': authors,
         'description': description,
-        'location': outputfile,
+        'id': name,
         'thumbnail': thumbnail
     }
-    with open(outputfile, 'w') as f:
+    with open(output_filename, 'w') as f:
         json.dump(metadata, f, indent=4)
 
 def get_file_json_contents(filepath):
@@ -69,7 +69,8 @@ class Download(Resource):
         args.description = unquote(args.description)
         args.thumbnail = unquote(args.thumbnail)
         saveseriesmetadata(args.url, args.title, args.authors, args.description, args.thumbnail)
-        getSeriesMutliProc(args.url, configuration.download_dir)
+        # getSeriesMutliProc(args.url, configuration.download_dir)
+        getSeries(args.url, configuration.download_dir)
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
 class GetAllBooks(Resource):
@@ -84,17 +85,41 @@ api.add_resource(Book, '/book')
 api.add_resource(Download, '/download')
 api.add_resource(GetAllBooks, '/getallbooks')
 
-# TODO FINISH THIS
 @app.route('/read/<book_id>')
-def getBook():
-    bookurl = request.values.get('bookurl')
-    return render_template(
-        'book.html',
-        book = query_backend('book', params={'url': bookurl}).json(),
-        download_endpoint = BACKEND_URL + 'download',
-        quote = requests.utils.quote
-    )
+def getBook(book_id):
+    comic_dir = configuration.download_dir
+    with open(os.path.join(comic_dir, book_id + '.json'), 'r') as f:
+        info = json.loads(f.read())
+    chapter_path = os.path.join(comic_dir, book_id)
+    chapters = os.listdir(chapter_path)
+    chapter_dict = {}
+    chapters.sort()
+    for chapter in chapters:
+        chapter_dict[chapter] = f'./{book_id}/{chapter}'
+    info['chapters'] = chapter_dict
+    return json.dumps(info)
 
+@app.route('/read/<book_id>/<chapter_id>')
+def getChapter(book_id, chapter_id):
+    response = {}
+    response['current_chapter'] = f'/read/{book_id}/{chapter_id}'
+    # response['current_chapter'] = str(int(chapter_id) + 1)
+    chapters = os.listdir(os.path.join(configuration.download_dir, book_id))
+    response['chapters'] = [f'/read/{book_id}/{c}' for c in chapters]
+    response['chapters'].sort()
+    with open(os.path.join(configuration.download_dir, book_id + '.json'), 'r') as f:
+        book_info = json.loads(f.read())
+    response['title'] = book_info['title']
+    base_path = request.base_url.rsplit('/', 3)[0]
+    chapter_dir = f'{configuration.download_dir}/{book_id}/{chapter_id}'
+    pages = os.listdir(chapter_dir)
+    pages.sort()
+    response['pages'] = [f'{base_path}/comics/{book_id}/{chapter_id}/{p}' for p in pages]
+    return json.dumps(response)
+
+@app.route('/comics/<path:path>')
+def send_file(path):
+    return send_from_directory(configuration.download_dir, path)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

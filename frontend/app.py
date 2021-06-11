@@ -49,15 +49,12 @@ def getBook():
 
 @app.route('/book', methods=['POST'])
 def downloadBook():
-    bookurl = request.values.get('url')
-    title = request.values.get('title')
-    authors = request.values.get('authors')
-    description = request.values.get('description')
     response = query_backend('download', params= {
-        'url': bookurl,
-        'title': title,
-        'authors': authors,
-        'description': description
+        'url': request.values.get('url'),
+        'title': request.values.get('title'),
+        'authors': request.values.get('authors'),
+        'description': request.values.get('description'),
+        'thumbnail': request.values.get('thumbnail')
     })
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
@@ -68,6 +65,27 @@ def getBooks():
     return render_template(
         'all_books.html',
         books = books
+    )
+
+@app.route('/read/<book_id>', methods=['GET'])
+def readBook(book_id):
+    response = query_backend('read/' + book_id, params=None).json()
+    return render_template(
+        'readbook.html',
+        book = response
+    )
+
+def get_chapter_name(chapter_url):
+    chapter = chapter_url.rsplit('/', 1)[1]
+    return f'Chapter {str(int(chapter) + 1)}'
+
+@app.route('/read/<book_id>/<chapter_id>', methods=['GET'])
+def readChatper(book_id, chapter_id):
+    response = query_backend(f'read/{book_id}/{chapter_id}', params=None).json()
+    return render_template(
+        'readchapter.html',
+        chapter_info = response,
+        chapter_to_text = get_chapter_name
     )
 
 if __name__ == '__main__':
