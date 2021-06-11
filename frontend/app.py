@@ -5,7 +5,7 @@ import requests
 
 import sys
 sys.path.append(os.path.abspath(os.path.join(__file__, '..', '..')))
-from configuration import headers
+from configuration import headers, frontend_port
 
 app = Flask(__name__)
 BACKEND_URL = 'http://127.0.0.1:5000/'
@@ -89,4 +89,4 @@ def readChatper(book_id, chapter_id):
     )
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=configuration.port, debug=True)

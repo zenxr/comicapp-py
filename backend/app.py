@@ -2,15 +2,16 @@ from flask import Flask, request, Response, send_from_directory
 from requests.models import ContentDecodingError
 from flask_restful import reqparse, Api, Resource
 from requests.utils import unquote
-
 import json
+import os
+import sys
 
+sys.path.append(os.path.abspath(os.path.join(__file__, '..', '..')))
+import configuration
 from ComicSearch.mangakalot_book import MangakalotBook
 from ComicSearch.mangakalot_search import MangakalotSearch
 from ComicSearch.search import BasicSearchQuery
 from ComicDownloader.downloader import download, getSeriesMutliProc, getSeries
-import configuration
-import os
 
 app = Flask(__name__)
 api = Api(app)
@@ -122,4 +123,4 @@ def send_file(path):
     return send_from_directory(configuration.download_dir, path)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=configuration.port, debug=True)
