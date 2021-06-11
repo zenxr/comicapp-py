@@ -37,7 +37,7 @@ def saveseriesmetadata(url, title, authors, description, thumbnail):
         'id': name,
         'thumbnail': thumbnail
     }
-    with open(output_filename, 'w') as f:
+    with open(os.path.join(configuration.download_dir, output_filename), 'w') as f:
         json.dump(metadata, f, indent=4)
 
 def get_file_json_contents(filepath):
@@ -69,8 +69,8 @@ class Download(Resource):
         args.description = unquote(args.description)
         args.thumbnail = unquote(args.thumbnail)
         saveseriesmetadata(args.url, args.title, args.authors, args.description, args.thumbnail)
-        # getSeriesMutliProc(args.url, configuration.download_dir)
-        getSeries(args.url, configuration.download_dir)
+        getSeriesMutliProc(args.url, configuration.download_dir)
+        # getSeries(args.url, configuration.download_dir)
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
 class GetAllBooks(Resource):
