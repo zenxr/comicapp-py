@@ -64,7 +64,7 @@ def getAllChapters(url):
     possible_chapters = chapter_list.findChildren("a", href=True)
     chapters = {}
     for idx, chapter in enumerate(possible_chapters):
-        chapters[str(idx).zfill(4)] = chapter['href']
+        chapters[str(len(possible_chapters) - 1 - idx).zfill(4)] = chapter['href']
     # TODO FIND BETTER WAY
     # for chapter in possible_chapters:
     #     chapters[chapter.text] = chapter['href']
