@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-import json
+import json 
 import os
 import requests
 
@@ -8,10 +8,11 @@ sys.path.append(os.path.abspath(os.path.join(__file__, '..', '..')))
 import configuration
 
 app = Flask(__name__)
-BACKEND_URL = f'http://127.0.0.1:{configuration.backend_port}/'
 
-def query_backend(endpoint, params):
-    return requests.get(url=f'{BACKEND_URL}{endpoint}', headers=configuration.headers, params=params)
+def query_backend(request, endpoint, params):
+    base_domain = request.base_url.rsplit(':', 1)[0]
+    backend_url = f'{base_domain}:{str(configuration.backend_port)}/'
+    return requests.get(url=f'{backend_url}{endpoint}', headers=configuration.headers, params=params)
 
 @app.route('/')
 def index():
@@ -25,7 +26,7 @@ def searchPost():
     try:
         data = request.form.to_dict()
         if data['searchquery']:
-            search_results = query_backend('search', params={'searchquery': data['searchquery']}).json()
+            search_results = query_backend(request, 'search', params={'searchquery': data['searchquery']}).json()
             search_results = json.loads(search_results)
         return render_template(
             'index.html',
@@ -42,14 +43,14 @@ def getBook():
     bookurl = request.values.get('bookurl')
     return render_template(
         'book.html',
-        book = query_backend('book', params={'url': bookurl}).json(),
+        book = query_backend(request, 'book', params={'url': bookurl}).json(),
         download_endpoint = BACKEND_URL + 'download',
         quote = requests.utils.quote
     )
 
 @app.route('/book', methods=['POST'])
 def downloadBook():
-    response = query_backend('download', params= {
+    response = query_backend(request, 'download', params= {
         'url': request.values.get('url'),
         'title': request.values.get('title'),
         'authors': request.values.get('authors'),
@@ -60,7 +61,7 @@ def downloadBook():
 
 @app.route('/read', methods=['GET'])
 def getBooks():
-    response = query_backend('getallbooks', params=None).json()
+    response = query_backend(request, 'getallbooks', params=None).json()
     books = json.loads(response)
     return render_template(
         'all_books.html',
@@ -69,7 +70,7 @@ def getBooks():
 
 @app.route('/read/<book_id>', methods=['GET'])
 def readBook(book_id):
-    response = query_backend('read/' + book_id, params=None).json()
+    response = query_backend(request, 'read/' + book_id, params=None).json()
     return render_template(
         'readbook.html',
         book = response
@@ -81,7 +82,7 @@ def get_chapter_name(chapter_url):
 
 @app.route('/read/<book_id>/<chapter_id>', methods=['GET'])
 def readChatper(book_id, chapter_id):
-    response = query_backend(f'read/{book_id}/{chapter_id}', params=None).json()
+    response = query_backend(request, f'read/{book_id}/{chapter_id}', params=None).json()
     return render_template(
         'readchapter.html',
         chapter_info = response,
