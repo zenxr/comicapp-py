@@ -15,7 +15,6 @@ from ComicDownloader.downloader import download, getSeriesMutliProc, getSeries
 
 app = Flask(__name__)
 api = Api(app)
-app_url = f'http://127.0.0.1:{configuration.backend_port}'
 
 def get_parser(*args):
     parser = reqparse.RequestParser()
