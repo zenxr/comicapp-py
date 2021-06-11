@@ -5,13 +5,13 @@ import requests
 
 import sys
 sys.path.append(os.path.abspath(os.path.join(__file__, '..', '..')))
-from configuration import headers, frontend_port
+import configuration
 
 app = Flask(__name__)
-BACKEND_URL = 'http://127.0.0.1:5000/'
+BACKEND_URL = f'http://127.0.0.1:{configuration.backend_port}/'
 
 def query_backend(endpoint, params):
-    return requests.get(url=f'{BACKEND_URL}{endpoint}', headers=headers, params=params)
+    return requests.get(url=f'{BACKEND_URL}{endpoint}', headers=configuration.headers, params=params)
 
 @app.route('/')
 def index():
@@ -89,4 +89,4 @@ def readChatper(book_id, chapter_id):
     )
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=configuration.port, debug=True)
+    app.run(host='0.0.0.0', port=configuration.frontend_port, debug=True)

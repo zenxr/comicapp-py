@@ -1,10 +1,14 @@
-import configuration as config
+import sys
 import requests
 import shutil
 import os
 from pathlib import Path
 from bs4 import BeautifulSoup as soup
 import multiprocessing
+
+sys.path.append(os.path.abspath(os.path.join(__file__, '..', '..')))
+import configuration as config
+
 
 def download(headers, urls, title, chapter, dir):
     # For every line in the file

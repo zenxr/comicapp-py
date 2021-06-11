@@ -1,8 +1,12 @@
 import requests
 import json
+import sys
+import os
 from bs4 import BeautifulSoup
 
 from ComicSearch.search import ComicSearch, ComicSearchConfig, BasicSearchQuery
+
+sys.path.append(os.path.abspath(os.path.join(__file__, '..', '..')))
 from configuration import headers
 
 class MangakalotSearch(ComicSearch):

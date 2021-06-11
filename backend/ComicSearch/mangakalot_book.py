@@ -1,7 +1,10 @@
 import requests
 import json
+import sys
+import os
 from bs4 import BeautifulSoup
 
+sys.path.append(os.path.abspath(os.path.join(__file__, '..', '..')))
 from configuration import headers
 
 class MangakalotBook(object):

@@ -15,7 +15,7 @@ from ComicDownloader.downloader import download, getSeriesMutliProc, getSeries
 
 app = Flask(__name__)
 api = Api(app)
-app_url = "http://127.0.0.1:5000"
+app_url = f'http://127.0.0.1:{configuration.backend_port}'
 
 def get_parser(*args):
     parser = reqparse.RequestParser()
@@ -123,4 +123,4 @@ def send_file(path):
     return send_from_directory(configuration.download_dir, path)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=configuration.port, debug=True)
+    app.run(host='0.0.0.0', port=configuration.backend_port, debug=True)
