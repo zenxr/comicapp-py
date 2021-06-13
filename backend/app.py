@@ -97,14 +97,18 @@ def getBook(book_id):
     for chapter in chapters:
         chapter_dict[chapter] = f'./{book_id}/{chapter}'
     info['chapters'] = chapter_dict
+    info['num_chapters'] = len(info['chapters'])
     return json.dumps(info)
 
 @app.route('/read/<book_id>/<chapter_id>')
 def getChapter(book_id, chapter_id):
     response = {}
     response['current_chapter'] = f'/read/{book_id}/{chapter_id}'
+    response['book_url'] = f'/read/{book_id}'
     # response['current_chapter'] = str(int(chapter_id) + 1)
     chapters = os.listdir(os.path.join(configuration.download_dir, book_id))
+    next_chapter = next(c for c in chapters if int(c) == int(chapter_id) + 1)
+    response['next_chapter'] = f'/read/{book_id}/{next_chapter}'
     response['chapters'] = [f'/read/{book_id}/{c}' for c in chapters]
     response['chapters'].sort()
     with open(os.path.join(configuration.download_dir, book_id + '.json'), 'r') as f:

@@ -15,8 +15,8 @@
               <p class="card-text">{{ book['authors'] }}</p>
               <h4 class="card-text">Description : </h4>
               <p class="card-text overflow-auto" style="height: 200px">{{ book['description'] }}</p>
-              <h4 class="card-text mt-3">Chapters : </h4>
-              <ul class="list-group">
+	      <h4 class="card-text mt-3">{{ book['num_chapters'] }} Chapters : </h4>
+              <ul class="list-group" style="overflow-y:auto; max-height:30vh">
                 {% for chapter in book['chapters'] %}
                 <li class="list-group">
                     <a href="{{ book['chapters'][chapter] }}">Chapter {{ chapter|int + 1 }}</a>
